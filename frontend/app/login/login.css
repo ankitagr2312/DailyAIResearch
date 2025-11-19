@@ -1,0 +1,246 @@
+/* frontend/app/login/login.css */
+
+/* 1. Page wrapper so styles don't affect whole app */
+.login-page {
+    min-height: 100vh;
+    background: #f6f5f7;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    padding: 24px;
+    gap: 20px;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+}
+
+/* Optional title above the card */
+.login-title {
+    text-align: center;
+    margin-bottom: 16px;
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+}
+
+/* 2. Main container (inspired by your snippet) */
+.login-container {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow:
+            0 14px 28px rgba(0, 0, 0, 0.25),
+            0 10px 10px rgba(0, 0, 0, 0.22);
+    position: relative;
+    overflow: hidden;
+    width: 768px;
+    max-width: 100%;
+    min-height: 480px;
+}
+
+/* 3. Form containers (sign in / sign up) */
+.login-form-container {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    transition: all 0.6s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-sign-in-container {
+    left: 0;
+    width: 50%;
+    z-index: 2;
+}
+
+.login-container.right-panel-active .login-sign-in-container {
+    transform: translateX(100%);
+}
+
+.login-sign-up-container {
+    left: 0;
+    width: 50%;
+    opacity: 0;
+    z-index: 1;
+}
+
+.login-container.right-panel-active .login-sign-up-container {
+    transform: translateX(100%);
+    opacity: 1;
+    z-index: 5;
+    animation: login-show 0.6s;
+}
+
+@keyframes login-show {
+    0%,
+    49.99% {
+        opacity: 0;
+        z-index: 1;
+    }
+
+    50%,
+    100% {
+        opacity: 1;
+        z-index: 5;
+    }
+}
+
+/* 4. Actual form styling */
+.login-form {
+    background-color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 0 50px;
+    height: 100%;
+    text-align: center;
+}
+
+.login-form h1 {
+    font-weight: 700;
+    margin: 0;
+}
+
+.login-form span {
+    font-size: 12px;
+    color: #555;
+}
+
+.login-input {
+    background-color: #eee;
+    border: none;
+    padding: 12px 15px;
+    margin: 8px 0;
+    width: 100%;
+    font-size: 14px;
+}
+
+.login-link {
+    color: #333;
+    font-size: 14px;
+    text-decoration: none;
+    margin: 15px 0;
+}
+
+/* 5. Buttons */
+.login-button {
+    border-radius: 20px;
+    border: 1px solid #ff4b2b;
+    background-color: #ff4b2b;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 12px 45px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: transform 80ms ease-in, background-color 150ms ease-in-out;
+    cursor: pointer;
+}
+
+.login-button:active {
+    transform: scale(0.95);
+}
+
+.login-button:focus {
+    outline: none;
+}
+
+/* Ghost button (transparent, white border) */
+.login-button-ghost {
+    background-color: transparent;
+    border-color: #ffffff;
+}
+
+/* 6. Overlay side (gradient panel) */
+.login-overlay-container {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 50%;
+    height: 100%;
+    overflow: hidden;
+    transition: transform 0.6s ease-in-out;
+    z-index: 100;
+}
+
+.login-container.right-panel-active .login-overlay-container {
+    transform: translateX(-100%);
+}
+
+.login-overlay {
+    background: #ff416c;
+    background: -webkit-linear-gradient(to right, #ff4b2b, #ff416c);
+    background: linear-gradient(to right, #ff4b2b, #ff416c);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: 0 0;
+    color: #ffffff;
+    position: relative;
+    left: -100%;
+    height: 100%;
+    width: 200%;
+    transform: translateX(0);
+    transition: transform 0.6s ease-in-out;
+}
+
+.login-container.right-panel-active .login-overlay {
+    transform: translateX(50%);
+}
+
+.login-overlay-panel {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 0 40px;
+    text-align: center;
+    top: 0;
+    height: 100%;
+    width: 50%;
+    transform: translateX(0);
+    transition: transform 0.6s ease-in-out;
+}
+
+.login-overlay-left {
+    transform: translateX(-20%);
+}
+
+.login-container.right-panel-active .login-overlay-left {
+    transform: translateX(0);
+}
+
+.login-overlay-right {
+    right: 0;
+    transform: translateX(0);
+}
+
+.login-container.right-panel-active .login-overlay-right {
+    transform: translateX(20%);
+}
+
+.login-overlay-panel h1 {
+    font-weight: 700;
+    margin: 0;
+}
+
+.login-overlay-panel p {
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 20px;
+    letter-spacing: 0.5px;
+    margin: 20px 0 30px;
+}
+
+@keyframes hover-glow {
+    0% {
+        transform: scale(1);
+        text-shadow: 0 0 0px rgba(0, 128, 255, 0.4);
+    }
+    100% {
+        transform: scale(1.1);
+        text-shadow: 0 0 12px rgba(0, 128, 255, 0.7);
+    }
+}
