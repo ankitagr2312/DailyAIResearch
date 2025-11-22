@@ -1,0 +1,131 @@
+########################################
+# IntelliJ / JetBrains IDE
+########################################
+.idea/
+*.iml
+out/
+*.ipr
+*.iws
+
+# IntelliJ build cache
+cmake-build-*/
+
+########################################
+# OS Files
+########################################
+.DS_Store
+Thumbs.db
+
+########################################
+# Logs
+########################################
+*.log
+logs/
+nohup.out
+
+########################################
+# Environment files / secrets
+########################################
+.env
+*.env.*
+.env.local
+.secrets/
+secret.yaml
+
+########################################
+# Backend (Java/Kotlin/Spring/Gradle/Maven)
+########################################
+# Maven
+target/
+!**/.mvn/wrapper/maven-wrapper.jar
+
+# Gradle
+.gradle/
+build/
+!**/gradle/wrapper/gradle-wrapper.jar
+
+# JVM
+*.class
+*.jar
+*.war
+*.ear
+
+########################################
+# Frontend (Node.js / React / Next.js etc.)
+########################################
+# Dependencies
+node_modules/
+bower_components/
+
+# Yarn / PnP (Yarn v2+ in any subdirectory)
+**/.pnp
+**/.pnp.*
+**/.yarn/*
+!**/.yarn/patches/
+!**/.yarn/plugins/
+!**/.yarn/releases/
+!**/.yarn/versions/
+
+# Builds
+dist/
+build/
+.next/
+out/
+
+# Cache
+.cache/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Testing
+coverage/
+
+# Misc Frontend
+*.tsbuildinfo
+next-env.d.ts
+.vercel
+*.pem
+
+########################################
+# Python Worker
+########################################
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+env/
+venv/
+pip-wheel-metadata/
+*.egg-info/
+.eggs/
+
+########################################
+# Infrastructure (Terraform, CDK, Pulumi)
+########################################
+# Terraform
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+
+# CDK
+cdk.out/
+
+# Pulumi
+.pulumi/
+
+########################################
+# Docker
+########################################
+docker-data/
+*.pid
+
+########################################
+# Misc
+########################################
+.idea_modules/
+.temp/
+tmp/
