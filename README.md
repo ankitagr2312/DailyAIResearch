@@ -12,6 +12,7 @@ Automatically pulls research from:
 - Substack/RSS feeds
 - arXiv papers
 - Uploaded PDFs, HTML files, or manual links
+- Sync any source(Future Roadmap)
 
 ### ✔ Technical Filtering
 Keeps only deep technical topics:
