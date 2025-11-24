@@ -98,3 +98,10 @@ def login(login_data: LoginRequest, db: Session = Depends(get_db)):
     )
 
     return Token(access_token=access_token, token_type="bearer")
+
+
+from app.core.deps import get_current_user
+
+@router.get("/me", response_model=UserRead)
+def read_me(current_user: User = Depends(get_current_user)):
+    return current_user

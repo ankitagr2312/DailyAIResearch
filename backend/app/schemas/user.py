@@ -34,3 +34,7 @@ class UserRead(UserBase):
     class Config:
         # Allow reading data from ORM objects (SQLAlchemy models)
         from_attributes = True
+
+class numbersAdder(BaseModel):
+    num1:int
+    num2:int

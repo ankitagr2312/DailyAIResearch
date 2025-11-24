@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .core.config import get_settings
 from app.api.routes import auth_router
+from app.schemas.user import numbersAdder
 
 # Get global settings (loaded from environment / .env)
 settings = get_settings()
