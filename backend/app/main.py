@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .core.config import get_settings
-from app.api.routes import auth_router
-from app.schemas.user import numbersAdder
+from app.api.routes import auth_router, topics_router, chat_router
+from app.api.routes.topics import router as topics_router
+
 
 # Get global settings (loaded from environment / .env)
 settings = get_settings()
@@ -27,6 +28,12 @@ app.add_middleware(
 
 # Include auth routes
 app.include_router(auth_router)
+
+# Include topic routes
+app.include_router(topics_router)
+
+# Include chat routes
+app.include_router(chat_router)
 
 
 # Health endpoint
