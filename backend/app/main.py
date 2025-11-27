@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from .core.config import get_settings
 from app.api.routes import auth_router, topics_router, chat_router
 from app.api.routes.topics import router as topics_router
+from fastapi.middleware.cors import CORSMiddleware
 
 
 # Get global settings (loaded from environment / .env)
@@ -16,6 +17,11 @@ app = FastAPI(
     description="Backend API for the DailyAIResearch copilot (MVP).",
 )
 
+# For CORS error , added this. Need to change later on.
+origins = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
 
 # Add CORS middleware using origins from settings
 app.add_middleware(

@@ -1,8 +1,12 @@
 // frontend/app/(main)/topics/page.tsx
+"use client";
+
 import TopicCard from "@/components/topics/TopicCard";
-import { mockTopics } from "@/lib/mock-data";
+import { useTopicsList } from "@/hooks/useTopics";
 
 export default function TopicsPage() {
+    const { topics, loading, error } = useTopicsList();
+
     return (
         <div className="flex flex-col gap-6">
             {/* Page Header */}
@@ -41,14 +45,29 @@ export default function TopicsPage() {
                 </select>
             </section>
 
+            {/* Loading / Error states */}
+            {loading && (
+                <p className="text-sm text-gray-500">Loading topics...</p>
+            )}
+
+            {error && (
+                <p className="text-sm text-red-600">{error}</p>
+            )}
+
             {/* Topics Grid */}
-            <section>
-                <div className="grid gap-4 md:grid-cols-2">
-                    {mockTopics.map((topic) => (
-                        <TopicCard key={topic.id} topic={topic} />
-                    ))}
-                </div>
-            </section>
+            {!loading && !error && (
+                <section>
+                    <div className="grid gap-4 md:grid-cols-2">
+                        {topics.map((topic) => (
+                            <TopicCard key={topic.id} topic={topic} />
+                        ))}
+                    </div>
+                </section>
+            )}
+
+            {!loading && !error && topics.length === 0 && (
+                <p className="text-sm text-gray-500">No topics found.</p>
+            )}
         </div>
     );
 }

@@ -14,3 +14,9 @@ export type Topic = {
     scores: TopicScores;
     tags: string[];
 };
+
+export interface TodayTopicsResponse {
+    date: string;
+    featured: Topic | null;
+    others: Topic[];
+}
