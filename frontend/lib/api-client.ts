@@ -13,6 +13,20 @@ export class ApiError extends Error {
     }
 }
 
+// Helper: get token from localStorage (only in browser)
+function getAccessToken(): string | null {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem("accessToken");
+}
+
+function buildAuthHeaders() {
+    const token = getAccessToken();
+    if (!token) return {};
+    return {
+        Authorization: `Bearer ${token}`,
+    };
+}
+
 // Generic helper for GET requests
 export async function apiGet<T>(path: string): Promise<T> {
     const url = `${API_BASE_URL}${path}`;
@@ -21,9 +35,8 @@ export async function apiGet<T>(path: string): Promise<T> {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
-            // later: add Authorization: Bearer <token> here
+            ...buildAuthHeaders(),
         },
-        // Important for Next.js: disable caching for dynamic data
         cache: "no-store",
     });
 
@@ -44,7 +57,7 @@ export async function apiPost<TReq, TRes>(path: string, body: TReq): Promise<TRe
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            // later: Authorization header
+            ...buildAuthHeaders(),
         },
         body: JSON.stringify(body),
     });

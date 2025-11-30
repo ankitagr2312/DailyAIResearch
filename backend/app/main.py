@@ -1,8 +1,7 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 from .core.config import get_settings
 from app.api.routes import auth_router, topics_router, chat_router
-from app.api.routes.topics import router as topics_router
+#from app.api.routes.topics import router as topics_router
 from fastapi.middleware.cors import CORSMiddleware
 
 
@@ -26,7 +25,7 @@ origins = [
 # Add CORS middleware using origins from settings
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
+    allow_origins=["*"],      # you can set ["*"] for dev as a quick test
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

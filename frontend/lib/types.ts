@@ -20,3 +20,31 @@ export interface TodayTopicsResponse {
     featured: Topic | null;
     others: Topic[];
 }
+
+export type ChatRole = "user" | "assistant";
+
+export interface ChatMessage {
+    id: string | number;
+    role: ChatRole;
+    content: string;
+    created_at: string; // match backend field name if it returns created_at
+}
+
+// A chat session returned by backend
+export interface ChatSession {
+    id: string | number;
+    topic_id: string | number | null;
+    title: string | null;
+    created_at: string;
+    updated_at?: string;
+}
+
+// Response from POST /api/chat/sessions
+export interface CreateChatSessionResponse extends ChatSession {}
+
+// Response from POST /api/chat/sessions/{id}/messages
+export interface SendMessageResponse {
+    session_id: string | number;
+    user_message: ChatMessage;
+    assistant_message: ChatMessage;
+}

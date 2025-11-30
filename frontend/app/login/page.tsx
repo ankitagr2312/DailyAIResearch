@@ -8,21 +8,41 @@ import "./login.css";
 export default function LoginPage() {
     const router = useRouter();
     const [isSignUp, setIsSignUp] = useState(false);
-    const [username, setUsername] = useState("");
+    const [email, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [loginError, setLoginError] = useState("");
 
     // Sign-in handler -> this is where admin/admin check happens
-    const handleSignIn = (e: FormEvent) => {
+    const handleSignIn = async (e: FormEvent) => {
         e.preventDefault();
+        setLoginError("");
 
-        if (username === "admin" && password === "admin") {
-            if (typeof window !== "undefined") {
-                window.localStorage.setItem("isAuthenticated", "true");
+        try {
+            const res = await fetch("http://127.0.0.1:8000/api/auth/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    email,
+                    password,
+                }),
+            });
+
+            if (!res.ok) {
+                setLoginError("Invalid username or password.");
+                return;
             }
-            router.push("/"); // go to dashboard
-        } else {
-            setLoginError("Invalid credentials. Try admin / admin.");
+
+            const data = await res.json();
+
+            console.log("LOGIN RESPONSE:", data);
+            // Save token
+            localStorage.setItem("accessToken", data.access_token);
+            localStorage.setItem("isAuthenticated", "true");
+
+            router.push("/");
+        } catch (error) {
+            console.error(error);
+            setLoginError("Login failed. Check backend.");
         }
     };
 
@@ -84,8 +104,8 @@ export default function LoginPage() {
                         <input
                             className="login-input"
                             type="text"
-                            placeholder="Username"
-                            value={username}
+                            placeholder="Email"
+                            value={email}
                             onChange={(e) => setUsername(e.target.value)}
                         />
                         <input
