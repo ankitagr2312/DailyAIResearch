@@ -77,9 +77,11 @@ export default function ChatPage() {
                 </header>
 
                 {/* Chat window */}
+
                 <div className="flex-1 min-h-0 rounded-xl border border-white/20 bg-white/10 backdrop-blur-md overflow-hidden flex flex-col">
                     <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                        {/* Intro message if no messages yet */}
+                        {console.log("CHAT MESSAGES IN UI:", messages)}
+
                         {shouldShowIntro && (
                             <MessageBubble
                                 message={{
@@ -93,9 +95,14 @@ export default function ChatPage() {
                             />
                         )}
 
-                        {messages.map((msg) => (
-                            <MessageBubble key={`${msg.role}-${msg.id}-${msg.created_at}`} message={msg} />
-                        ))}
+                        {messages
+                            .filter((m): m is ChatMessage => Boolean(m))
+                            .map((msg) => (
+                                <MessageBubble
+                                    key={`${msg.role}-${msg.id}-${msg.created_at ?? ""}`}
+                                    message={msg}
+                                />
+                            ))}
 
                         {isSending && (
                             <div className="flex items-center gap-2 text-xs text-gray-200">

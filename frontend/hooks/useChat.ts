@@ -2,107 +2,130 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { apiGet, apiPost, ApiError } from "@/lib/api-client";
-import type {
-    ChatMessage,
-    CreateChatSessionResponse,
-    SendMessageResponse,
-} from "@/lib/types";
+import { apiPost, ApiError } from "@/lib/api-client";
+import type { ChatMessage } from "@/lib/types";
 
-/**
- * useChat hook
- * - Manages chat session (global or topic)
- * - Sends messages to backend
- * - Stores messages in state
- */
-export function useChat(options?: { topicId?: string | null }) {
-    const { topicId = null } = options || {};
+interface UseChatParams {
+    topicId: string | null;
+}
 
-    const [sessionId, setSessionId] = useState<string | number | null>(null);
+interface ChatSession {
+    id: number;
+    mode: string;
+    title: string | null;
+    user_id: number;
+    topic_id: number | null;
+    is_archived: boolean;
+    created_at: string;
+    updated_at: string;
+}
+
+// 👇 match the actual backend payload you showed
+interface SendMessageResponse {
+    session: ChatSession;
+    messages: ChatMessage[]; // [{...user}, {...assistant}]
+}
+
+export function useChat({ topicId }: UseChatParams) {
+    const [sessionId, setSessionId] = useState<number | null>(null);
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [isSending, setIsSending] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     /**
-     * Ensure we have a session.
-     * If no session yet, call POST /chat/sessions and store id.
+     * Ensure we have a chat session on the backend.
+     * - If we already have sessionId in state, reuse it.
+     * - Otherwise call POST /chat/sessions and store the id.
      */
-    const ensureSession = useCallback(async () => {
-        if (sessionId !== null) return sessionId;
+    const ensureSession = useCallback(async (): Promise<number> => {
+        if (sessionId !== null) {
+            return sessionId;
+        }
+
+        setError(null);
+
+        const body = {
+            topic_id: topicId, // null = global chat
+            title: null,
+        };
 
         try {
-            const body = {
-                topic_id: topicId, // null means global chat
-                title: null,
-            };
-
-            const res = await apiPost<typeof body, CreateChatSessionResponse>(
-                "/chat/sessions",
-                body
-            );
+            // Your create-session endpoint likely returns just the session
+            const res = await apiPost<typeof body, ChatSession>("/chat/sessions", body);
 
             setSessionId(res.id);
-
-            // Optionally load existing messages if backend supports it
-            // (for now, we start empty; ChatPage already shows a welcome message in UI)
-
             return res.id;
         } catch (err) {
             console.error("Failed to create chat session", err);
+            if (err instanceof ApiError) {
+                setError(`Failed to create chat session (status ${err.status})`);
+            } else {
+                setError("Failed to create chat session.");
+            }
             throw err;
         }
     }, [sessionId, topicId]);
 
     /**
      * Send a message:
-     * - Ensure we have a session
-     * - Add user message locally
-     * - Call backend
-     * - Append assistant reply
+     * 1. Ensure session exists
+     * 2. Add user message locally (optimistic)
+     * 3. Call backend POST /chat/sessions/{id}/messages
+     * 4. Append assistant message from backend (from response.messages)
      */
     const sendMessage = useCallback(
         async (content: string) => {
             const trimmed = content.trim();
             if (!trimmed) return;
 
-            setError(null);
             setIsSending(true);
+            setError(null);
+
+            const now = new Date().toISOString();
+            const tempId = `local-${Date.now()}`;
+
+            // 2) Optimistically add user message
+            const userLocalMessage: ChatMessage = {
+                id: tempId,
+                role: "user",
+                content: trimmed,
+                created_at: now,
+            };
+
+            setMessages((prev) => [...prev, userLocalMessage]);
 
             try {
-                // 1. Ensure session exists
-                const effectiveSessionId = await ensureSession();
+                // 1) Ensure session
+                const session = await ensureSession();
 
-                // 2. Create local user message (optimistic)
-                const now = new Date().toISOString();
-                const userMessage: ChatMessage = {
-                    id: `local-${Date.now()}`,
-                    role: "user",
-                    content: trimmed,
-                    created_at: now,
-                };
-
-                setMessages((prev) => [...prev, userMessage]);
-
-                // 3. Call backend
+                // 3) Call backend
                 const body = { content: trimmed };
+
                 const res = await apiPost<typeof body, SendMessageResponse>(
-                    `/chat/sessions/${effectiveSessionId}/messages`,
+                    `/chat/sessions/${session}/messages`,
                     body
                 );
 
-                // 4. Append assistant message from backend
-                setMessages((prev) => [
-                    ...prev,
-                    // use backend's canonical user message & assistant message
-                    res.assistant_message,
-                ]);
+                console.log("BACKEND CHAT RESPONSE:", res);
+
+                // 4) Pick assistant message from res.messages
+                if (Array.isArray(res.messages) && res.messages.length > 0) {
+                    // Try to find the assistant message explicitly
+                    const assistant =
+                        res.messages.find((m) => m.role === "assistant") ??
+                        res.messages[res.messages.length - 1];
+
+                    setMessages((prev) => [...prev, assistant]);
+                } else {
+                    console.warn("No messages array in response", res);
+                }
             } catch (err) {
                 console.error("Failed to send message", err);
-                const msg =
-                    err instanceof ApiError
-                        ? `Failed to send message (status ${err.status})`
-                        : "Failed to send message";
-                setError(msg);
+                if (err instanceof ApiError) {
+                    setError(`Failed to send message (status ${err.status})`);
+                } else {
+                    setError("Failed to send message.");
+                }
             } finally {
                 setIsSending(false);
             }
