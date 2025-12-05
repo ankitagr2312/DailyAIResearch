@@ -4,13 +4,16 @@
 import {FormEvent, useState} from "react";
 import {useRouter} from "next/navigation";
 import "./login.css";
+import Error from "next/error";
 
 export default function LoginPage() {
     const router = useRouter();
     const [isSignUp, setIsSignUp] = useState(false);
-    const [email, setUsername] = useState("");
+    const [fullName, setUsername] = useState("");
+    const [email, setUsermail] = useState("");
     const [password, setPassword] = useState("");
     const [loginError, setLoginError] = useState("");
+    const [signUpError, setSignUpError] = useState("");
 
     // Sign-in handler -> this is where admin/admin check happens
     const handleSignIn = async (e: FormEvent) => {
@@ -47,10 +50,54 @@ export default function LoginPage() {
     };
 
     // Sign-up is just visual for now
-    const handleSignUp = (e: FormEvent) => {
+    const handleSignUp = async (e: FormEvent) => {
         e.preventDefault();
         // You can plug real sign-up logic later.
-        alert("Sign-up UI only for now 🙂");
+        setLoginError("");
+
+        try {
+            const res = await fetch("http://127.0.0.1:8000/api/auth/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    email,
+                    password,
+                }),
+            });
+
+            if (!res.ok) {
+                let message = "Sign up failed.";
+
+                try {
+                    const data = await res.json();
+                    // Many FastAPI endpoints return {"detail": "..."}
+                    if (data.detail) {
+                        message = data.detail;
+                    }
+                } catch {
+                    // if body is not JSON, ignore and keep default message
+                }
+
+                setSignUpError(message);
+                return;
+            }
+
+            const data = await res.json();
+            console.log("SIGNUP RESPONSE:", data);
+
+            // For now: do NOT auto-login. Just switch to sign-in panel.
+            setIsSignUp(false);
+            setLoginError("Account created! Please sign in.");
+
+            // Save token
+            // localStorage.setItem("accessToken", data.access_token);
+            // localStorage.setItem("isAuthenticated", "true");
+
+            router.push("/");
+        } catch (error) {
+            console.error(error);
+            setLoginError("SignUp failed: "+ error);
+        }
     };
 
     return (
@@ -78,18 +125,32 @@ export default function LoginPage() {
                         <input
                             className="login-input"
                             type="text"
-                            placeholder="Name"
+                            placeholder="Full Name"
+                            value={fullName}
+                            onChange={(e) => setUsername(e.target.value)}
                         />
                         <input
                             className="login-input"
                             type="email"
                             placeholder="Email"
+                            value={email}
+                            onChange={(e) => setUsermail(e.target.value)}
                         />
                         <input
                             className="login-input"
                             type="password"
                             placeholder="Password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                         />
+
+                        {/* 🔴 Show signup errors here */}
+                        {signUpError && (
+                            <p style={{ color: "#e11d48", fontSize: 12, marginTop: 8 }}>
+                                {signUpError}
+                            </p>
+                        )}
+
                         <button type="submit" className="login-button">
                             Sign Up
                         </button>
@@ -106,7 +167,7 @@ export default function LoginPage() {
                             type="text"
                             placeholder="Email"
                             value={email}
-                            onChange={(e) => setUsername(e.target.value)}
+                            onChange={(e) => setUsermail(e.target.value)}
                         />
                         <input
                             className="login-input"
