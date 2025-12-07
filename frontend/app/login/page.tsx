@@ -4,7 +4,9 @@
 import {FormEvent, useState} from "react";
 import {useRouter} from "next/navigation";
 import "./login.css";
-import Error from "next/error";
+import { API_BASE_URL } from "@/lib/config";
+
+
 
 export default function LoginPage() {
     const router = useRouter();
@@ -21,7 +23,7 @@ export default function LoginPage() {
         setLoginError("");
 
         try {
-            const res = await fetch("http://127.0.0.1:8000/api/auth/login", {
+            const res = await fetch(`${API_BASE_URL}/auth/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -56,7 +58,7 @@ export default function LoginPage() {
         setLoginError("");
 
         try {
-            const res = await fetch("http://127.0.0.1:8000/api/auth/register", {
+            const res = await fetch(`${API_BASE_URL}/auth/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({

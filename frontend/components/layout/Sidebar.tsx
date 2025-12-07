@@ -1,10 +1,26 @@
 "use client";
+
 import Link from "next/link";
-import Lottie from "lottie-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useState, useCallback } from "react";
 import { oldChats } from "@/lib/mock-data";
 
 export default function Sidebar() {
+    const router = useRouter();
+
+    // controls whether profile dropdown is open or closed
+    const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+
+    const handleLogout = useCallback(() => {
+        // Clear auth data
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("isAuthenticated");
+
+        // Redirect to login
+        router.push("/login");
+    }, [router]);
+
 
     return (
         <div className="w-60 bg-gray-100 text-black h-screen p-4 flex flex-col gap-4 border-r border-gray-300">
@@ -100,17 +116,75 @@ export default function Sidebar() {
             {/* Divider */}
             {/* <div className="border-t border-gray-300 my-4" />*/}
 
-            {/* PROFILE BUTTON (sticks bottom) */}
-            <div className="mt-auto border-t border-gray-300 pt-4">
-                <button className="flex items-center gap-2 w-full p-2 rounded-md hover:bg-gray-200 transition">
-                    <div
-                        className="h-8 w-8 bg-gray-400 rounded-full flex items-center justify-center text-white font-semibold">
+            {/* PROFILE SECTION WITH DROPDOWN (sticks bottom) */}
+            <div className="mt-auto border-t border-gray-300 pt-4 relative">
+                {/* Profile row (click to toggle menu) */}
+                <button
+                    type="button"
+                    onClick={() => setIsProfileMenuOpen((open) => !open)}
+                    className="flex items-center gap-2 w-full p-2 rounded-md hover:bg-gray-200 transition"
+                >
+                    {/* Avatar */}
+                    <div className="h-8 w-8 bg-gray-400 rounded-full flex items-center justify-center text-white font-semibold">
                         A
                     </div>
-                    <span className="text-sm font-medium">Ankit</span>
-                </button>
-            </div>
 
+                    {/* Name + email (for now just name) */}
+                    <div className="flex flex-col items-start">
+                        <span className="text-sm font-medium">Ankit</span>
+                        {/* Later you can add email here if you want */}
+                        {/* <span className="text-xs text-gray-500">ankit@attentions.ai</span> */}
+                    </div>
+
+                    {/* Caret icon on the right */}
+                    <span className="ml-auto text-xs text-gray-500">
+            ▼
+        </span>
+                </button>
+
+                {/* Dropdown menu */}
+                {isProfileMenuOpen && (
+                    <div
+                        className="
+                absolute bottom-14 right-0
+                w-40
+                rounded-lg border border-gray-200
+                bg-white shadow-lg
+                py-1
+                z-20
+            "
+                    >
+                        <button
+                            type="button"
+                            className="
+                    block w-full text-left
+                    px-3 py-2 text-sm
+                    text-gray-700
+                    hover:bg-gray-100
+                "
+                            onClick={() => {
+                                // for now just close menu; later can do router.push("/settings")
+                                setIsProfileMenuOpen(false);
+                            }}
+                        >
+                            Settings
+                        </button>
+
+                        <button
+                            type="button"
+                            className="
+                    block w-full text-left
+                    px-3 py-2 text-sm
+                    text-red-600
+                    hover:bg-red-50
+                "
+                            onClick={handleLogout}
+                        >
+                            Logout
+                        </button>
+                    </div>
+                )}
+            </div>
         </div>
     );
 }
