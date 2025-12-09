@@ -34,8 +34,11 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
-    # AI / Vector store
+    # AI
     OLLAMA_BASE_URL: str = "http://127.0.0.1:11434"
+    OLLAMA_MODEL: str = "gemma3:1b"
+
+    # Vector store
     MILVUS_URI: str = "milvus.db"  # Milvus Lite local file / path
 
     class Config:
