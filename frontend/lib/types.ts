@@ -33,10 +33,13 @@ export interface ChatMessage {
 // A chat session returned by backend
 export interface ChatSession {
     id: string | number;
-    topic_id: string | number | null;
+    mode: string;
     title: string | null;
+    user_id: number;
+    topic_id: string | number | null;
+    is_archieved:boolean;
     created_at: string;
-    updated_at?: string;
+    updated_at: string;
 }
 
 // Response from POST /api/chat/sessions

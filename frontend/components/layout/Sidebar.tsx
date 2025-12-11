@@ -4,13 +4,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState, useCallback } from "react";
-import { oldChats } from "@/lib/mock-data";
+import { useChatSessions } from "@/hooks/useChatSessions";
 
 export default function Sidebar() {
     const router = useRouter();
 
     // controls whether profile dropdown is open or closed
     const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+    const { sessions, loading: loadingSessions, error: sessionsError } = useChatSessions();
 
     const handleLogout = useCallback(() => {
         // Clear auth data
@@ -101,17 +102,31 @@ export default function Sidebar() {
             <div className="flex flex-col gap-2 overflow-auto">
                 <h2 className="text-sm font-semibold text-gray-600">Old Chats</h2>
 
-                <div className="flex flex-col gap-4">
-                    {oldChats.map((chat) => (
-                        <Link
-                            key={chat.id}
-                            href={`/chat/global?id=${chat.id}`}
-                            className="text-sm text-gray-800 hover:text-blue-600 truncate"
-                        >
-                            {chat.title}
-                        </Link>
-                    ))}
-                </div>
+                {loadingSessions && (
+                    <p className="text-xs text-gray-500">Loading...</p>
+                )}
+
+                {sessionsError && (
+                    <p className="text-xs text-red-500">{sessionsError}</p>
+                )}
+
+                {!loadingSessions && !sessionsError && (
+                    <div className="flex flex-col gap-2">
+                        {sessions.length === 0 && (
+                            <p className="text-xs text-gray-500">No chats yet.</p>
+                        )}
+
+                        {sessions.map((session) => (
+                            <Link
+                                key={session.id}
+                                href={`/chat?sessionId=${session.id}`}
+                                className="text-sm text-gray-800 hover:text-blue-600 truncate"
+                            >
+                                {session.title || `Session #${session.id}`}
+                            </Link>
+                        ))}
+                    </div>
+                )}
             </div>
             {/* Divider */}
             {/* <div className="border-t border-gray-300 my-4" />*/}
